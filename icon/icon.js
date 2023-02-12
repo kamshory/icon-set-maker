@@ -1,4 +1,11 @@
-let iconDimensions = {width:700, height:700};
+/**
+ * Original icon dimension
+ */
+let iconDimensions = {width:640, height:640};
+
+/**
+ * Create new icon
+ */
 let clickNewIcon = function(){
     $.confirm("<strong>Do you want to clear the drawing?</strong>\nThis will also erase your undo history", function(ok) {
         if(!ok) 
@@ -20,6 +27,9 @@ let IconSet = {
     data: []
 };
 
+/**
+ * Export current icon
+ */
 let clickExportIcon = function(){ 
     let data = svgCanvas.svgCanvasToString()+'';
     let width = iconDimensions.width;
@@ -40,6 +50,11 @@ let clickExportIcon = function(){
     exportAndDownload('icons.zip');
 };
 
+/**
+ * Export image and download it
+ * @param {string} fileName ZIP file name
+ * @returns {void}
+ */
 let exportAndDownload = function(fileName)
 {
     if(IconSet.pendingProcess > IconSet.finishedProcess)
@@ -60,6 +75,17 @@ let exportAndDownload = function(fileName)
     });
 }
 
+/**
+ * Export image as raster
+ * @param {string} data XML data containing image
+ * @param {number} originalWidth Original image width
+ * @param {number} originalHeight Original image height
+ * @param {string} fileName File name
+ * @param {string} type Image type
+ * @param {number} width Target image width
+ * @param {number} height Target image width
+ * @returns {void}
+ */
 let exportRaster = function(data, originalWidth, originalHeight, fileName, type, width, height)
 {
     IconSet.pendingProcess++;
@@ -113,6 +139,11 @@ let exportRaster = function(data, originalWidth, originalHeight, fileName, type,
     img.src = url;
 }
 
+/**
+ * 
+ * @param {Array} images Uint8Array of PNG image data
+ * @returns {Array} Uint8Array of ICO image data
+ */
 let pngToIco = function(images)
 {
     let icoHead = [ //.ico header
