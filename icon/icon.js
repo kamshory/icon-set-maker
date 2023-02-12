@@ -3,6 +3,16 @@
  */
 let iconDimensions = {width:640, height:640};
 
+let iconSetInfo = [
+    {fileName:'android-chrome-512x512.png', type:'image/png', width:512, height:512},
+    {fileName:'android-chrome-192x192.png', type:'image/png', width:192, height:192},
+    {fileName:'apple-touch-icon.png', type:'image/png', width:180, height:180},
+    {fileName:'favicon-32x32.png', type:'image/png', width:32, height:32},
+    {fileName:'favicon-16x16.png', type:'image/png', width:16, height:16},
+    {fileName:'favicon.ico', type:'image/x-ico', width:32, height:32}
+];
+
+
 /**
  * Create new icon
  */
@@ -41,12 +51,10 @@ let clickExportIcon = function(){
         content:data
     }
     );
-    exportRaster(data, width, height, 'android-chrome-512x512.png', 'image/png', 512, 512);
-    exportRaster(data, width, height, 'android-chrome-192x192.png', 'image/png', 192, 192);
-    exportRaster(data, width, height, 'apple-touch-icon.png', 'image/png', 180, 180);
-    exportRaster(data, width, height, 'favicon-32x32.png', 'image/png', 32, 32);
-    exportRaster(data, width, height, 'favicon-16x16.png', 'image/png', 16, 16);
-    exportRaster(data, width, height, 'favicon.ico', 'image/x-ico', 32, 32);
+    for(let i in iconSetInfo)
+    {
+        exportRaster(data, width, height, iconSetInfo[i].fileName, iconSetInfo[i].type, iconSetInfo[i].width, iconSetInfo[i].height);
+    }
     exportAndDownload('icons.zip');
 };
 
@@ -100,41 +108,38 @@ let exportRaster = function(data, originalWidth, originalHeight, fileName, type,
         canvas.setAttribute('height', height);
         ctx.drawImage(img, 0, 0, originalWidth, originalHeight, 0, 0, width, height);
         DOMURL.revokeObjectURL(url);
-        if(type == 'image/x-ico')
-        {
-            let images = [];
-            canvas.toBlob(function(blobPng) {
-                if(type == 'image/x-ico')
-                {
-                    let reader = new FileReader();
-                    reader.readAsArrayBuffer(blobPng);
-                    reader.onloadend = (event) => {
-                        images[0] = new Uint8Array(reader.result);
-                        let icoData = pngToIco(images); 
-                        let blobIco = new Blob([new Uint8Array(icoData)], {type: type});
-                        IconSet.data.push({
-                            fileName:fileName,
-                            width:width,
-                            height:height,
-                            content:blobIco
-                        });                              
-                        IconSet.finishedProcess++;
-                    }
+        canvas.toBlob(function(blobPng) {
+            if(type == 'image/x-ico')
+            {
+                let images = [];
+                let reader = new FileReader();
+                reader.readAsArrayBuffer(blobPng);
+                reader.onloadend = (event) => {
+                    images[0] = new Uint8Array(reader.result);
+                    let icoData = pngToIco(images); 
+                    let blobIco = new Blob([new Uint8Array(icoData)], {type: type});
+                    IconSet.data.push({
+                        fileName:fileName,
+                        width:width,
+                        height:height,
+                        content:blobIco
+                    });                              
+                    IconSet.finishedProcess++;
                 }
-                else if(type == 'image/png')
-                {
-                    canvas.toBlob(function(blobPng) {
-                        IconSet.data.push({
-                            fileName:fileName,
-                            width:width,
-                            height:height,
-                            content:blobPng
-                        });            
-                        IconSet.finishedProcess++;
-                    });
-                }         
-            });
-        }    
+            }
+            else if(type == 'image/png')
+            {
+                canvas.toBlob(function(blobPng) {
+                    IconSet.data.push({
+                        fileName:fileName,
+                        width:width,
+                        height:height,
+                        content:blobPng
+                    });            
+                    IconSet.finishedProcess++;
+                });
+            }         
+        });   
     }				
     img.src = url;
 }
