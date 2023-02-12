@@ -12,7 +12,6 @@ let iconSetInfo = [
     {fileName:'favicon.ico', type:'image/x-ico', width:32, height:32}
 ];
 
-
 /**
  * Create new icon
  */
